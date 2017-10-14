@@ -10,4 +10,10 @@ ____
 
 **!randommap** - Provides a random map. You can add parameters (veasy, easy, medium, hard, vhard, death) to get specific maps. You can also use a "help" parameter to show how to use it in twitch chat.
 
-**!maptop** (map name) - Provides a kzstats link of the map given as a parameter. You can provide a partial map name or the full map name as a parameter.
+**!maptop** (map name) - Provides a [kzstats](http://www.kzstats.com/) link of the map given as a parameter. You can provide a partial map name or the full map name as a parameter.
+
+**!kzstats** - Provides a link to [kzstats](http://www.kzstats.com/).
+
+**!gokzstats** - Provides a link to [GOKZ Stats](https://www.jacobwbarrett.com/kreedz/gokzstats.html).
+
+**!servers** - Provides a link to [KZStats server link](http://www.kzstats.com/servers/).
