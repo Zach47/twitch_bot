@@ -6,7 +6,7 @@ Originally created as a means of replacing Orbit's custom nightbot command "!map
 ____
 # Commands
 
-!kzcommands - Shows all commands available for the bot.
+**!kzcommands** - Shows all commands available for the bot.
 
 !randommap - Provides a random map. You can add parameters (veasy, easy, medium, hard, vhard, death) to get specific maps. You can also use a "help" parameter to show how to use it in twitch chat.
 
