@@ -1,19 +1,23 @@
-//Initial requires.
+// Kreedz Bot, by Jacob Barrett (Zach47)
+// This is a functioning twitch bot that is useful for cs:go kreedz streamers.
+// Version 1.1
+
 var tmi = require('tmi.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
 var jsonMapId = {};
 var maplist = [];
+var combinedMapList = [];
 var VeryEasyMaps = [];
 var EasyMaps = [];
 var MediumMaps = [];
 var HardMaps = [];
 var VeryHardMaps = [];
 var DeathMaps = [];
-
 var mapName = "";
 var error = "";
-//These are the settings for the client to use.
+
+
+
 var options = {
   options: {
     debug: true
@@ -26,9 +30,9 @@ var options = {
 
   identity: {
     username: "kreedz_bot",
-    password: "Good one"
+    password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   },
-  channels: ["orbit_cs","ijjust"]
+  channels: ["ijjust","orbit_cs","sachburger"]
 }
 
 
@@ -53,7 +57,7 @@ function mapInfoRequest() {
 
   request.onload = function() {
     if (request.status >= 200 && request.status < 400) {
-      // Success!
+
       var maps = JSON.parse(request.responseText);
       for (i=0;i<maps.length;i++) {
         if (maps[i].Global === 0) {
@@ -105,7 +109,6 @@ var client = new tmi.client(options);
 client.connect();
 
 client.on("connected", function(address, port, channel){
-  client.action("ijjust", "has been started.");
   mapInfoRequest();
 });
 
@@ -147,37 +150,67 @@ client.on("chat", function(channel, user, message, self){
   if(message.toLowerCase().startsWith("!randommap")) {
     var randomGet = 0;
 
-    switch(message.split(" ")[1]) {
-      case "help":
-        client.say(channel, "You can use !randommap by itself and it will give you any map. Use these parameters with !randommap if you'd like a specific difficulty: veasy, easy, medium, hard, vhard, death.");
+
+    if (message.split(" ").length.toString() > 2) {
+      var splitMessage = message.split(" ");
+      combinedMapList = [];
+
+      for (i=1;i<message.split(" ").length;i++) {
+        if (splitMessage[i] == "veasy") {
+          combinedMapList.push.apply(combinedMapList, VeryEasyMaps);
+        }
+        if (splitMessage[i] == "easy") {
+          combinedMapList.push.apply(combinedMapList, EasyMaps);
+        }
+        if (splitMessage[i] == "medium") {
+          combinedMapList.push.apply(combinedMapList, MediumMaps);
+        }
+        if (splitMessage[i] == "hard") {
+          combinedMapList.push.apply(combinedMapList, HardMaps);
+        }
+        if (splitMessage[i] == "vhard") {
+          combinedMapList.push.apply(combinedMapList, VeryHardMaps);
+        }
+        if (splitMessage[i] == "death") {
+          combinedMapList.push.apply(combinedMapList, DeathMaps);
+        }
+      }
+      randomGet = Math.round(Math.random()*(combinedMapList.length - 1));
+      client.say(channel, combinedMapList[randomGet].mapname);
+    } else {
+
+      switch(message.split(" ")[1]) {
+        case "help":
+        client.say(channel, "You can use !randommap by itself and it will give you any map. Use these parameters (including multiple parameters) with !randommap if you'd like a specific difficulty range: veasy, easy, medium, hard, vhard, death.");
         break;
-      case "veasy":
+        case "veasy":
         randomGet = Math.round(Math.random()*(VeryEasyMaps.length - 1));
         client.say(channel, VeryEasyMaps[randomGet].mapname);
         break;
-      case "easy":
+        case "easy":
         randomGet = Math.round(Math.random()*(EasyMaps.length - 1));
         client.say(channel, EasyMaps[randomGet].mapname);
         break;
-      case "medium":
+        case "medium":
         randomGet = Math.round(Math.random()*(MediumMaps.length - 1));
         client.say(channel, MediumMaps[randomGet].mapname);
         break;
-      case "hard":
+        case "hard":
         randomGet = Math.round(Math.random()*(HardMaps.length - 1));
         client.say(channel, HardMaps[randomGet].mapname);
         break;
-      case "vhard":
+        case "vhard":
         randomGet = Math.round(Math.random()*(VeryHardMaps.length - 1));
         client.say(channel, VeryHardMaps[randomGet].mapname);
         break;
-      case "death":
+        case "death":
         randomGet = Math.round(Math.random()*(DeathMaps.length - 1));
         client.say(channel, DeathMaps[randomGet].mapname);
         break;
-      default:
+        default:
         randomGet = Math.round(Math.random()*(maplist.length - 1));
         client.say(channel, maplist[randomGet]);
+      }
     }
   }
 });
