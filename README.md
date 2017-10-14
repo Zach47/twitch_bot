@@ -12,7 +12,7 @@ ____
 
 **!maptop** (map name) - Provides a [kzstats](http://www.kzstats.com/) link of the map given as a parameter. You can provide a partial map name or the full map name as a parameter.
 
-**!kzstats** - Provides a link to [kzstats](http://www.kzstats.com/).
+**!kzstats** - Provides a link to [KZStats](http://www.kzstats.com/).
 
 **!gokzstats** - Provides a link to [GOKZ Stats](https://www.jacobwbarrett.com/kreedz/gokzstats.html).
 
