@@ -129,7 +129,7 @@ client.on("chat", function(channel, user, message, self){
   }
 
   if(message.toLowerCase().startsWith("!kzcommands")) {
-    client.say(channel, "A full list coming soon! Message ijjust on twitch or Zach47 on Steam for any questions since I am a bot. Any suggestions for commands are encouraged.");
+    client.say(channel, "A full list of commands is available here: https://github.com/Zach47/twitch_bot/ If you have any suggestions, please message Zach47 on Discord or Steam.");
   }
 
   if(message.toLowerCase().startsWith("!servers")) {
