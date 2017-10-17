@@ -29,4 +29,7 @@ ____
         If someone types !select random, it will randomly select a map from the nominated list.
         If someone types !select (map name), the map must both be a kreedz map and in the nominated map list.
 
+**!deletenom** (map name) - Deletes one nomination from the nomination list.
+
 **!clearnom** - Clears every nominated map.
+
