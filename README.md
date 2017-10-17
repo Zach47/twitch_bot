@@ -14,6 +14,14 @@ ____
 
 **!maptop** (map name) - Provides a [kzstats](http://www.kzstats.com/) link of the map given as a parameter. You can provide a partial map name or the full map name as a parameter.
 
+**!nominate** (map name) - Allows users to nominate maps for the streamer to play.
+
+**!nomlist** - See which maps are nominated.
+
+**!select** ("random" or map name) - Allows **mods** and **the streamer** to select which of the nominated maps to play.
+        If someone types !select random, it will randomly select a map from the nominated list.
+        If someone types !select (map name), the map must both be a kreedz map and in the nominated map list.
+
 **!kzstats** - Provides a link to [KZStats](http://www.kzstats.com/).
 
 **!gokzstats** - Provides a link to [GOKZ Stats](https://www.jacobwbarrett.com/kreedz/gokzstats.html).
