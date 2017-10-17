@@ -1,6 +1,6 @@
 // Kreedz Bot, by Jacob Barrett (Zach47)
 // This is a functioning twitch bot that is useful for cs:go kreedz streamers.
-// Version 1.2
+// Version 1.2.1
 
 var tmi = require('tmi.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -145,157 +145,149 @@ client.on("chat", function(channel, user, message, self){
     }
   }
 
-
-
-
-
   if (message.toLowerCase().startsWith("!nominate")) {
     if (message.split(" ")[1] == void 0) {
       client.say(channel, "You forgot to nominate a map!");
       return;
     }
-
     else {
       client.say(channel, (addNomination(message.split(" ")[1].toLowerCase())) ? mapName + " has been added to the nomination list" : error);
     }
   }
 
-
+  if (message.toLowerCase() === "!clearnom" && (user.mod === true || user.badges.broadcaster === "1")) {
+      NominatedMapArray = [];
+      client.say(channel, "Nomination list has been cleared by " + user.username)
+  }
 
 
   if (message.toLowerCase().startsWith("!nomlist")) {
+    console.log(user);
     if (NominatedMapArray.length === 0) {
       client.say(channel, "There aren't any nominated maps.");
     }
-    nomListString = "";
-    for (i=0;i<NominatedMapArray.length;i++) {
-      if (nomListString.length === 0) {
-        nomListString += NominatedMapArray[i];
-      }
-      else {
-        nomListString += ", " + NominatedMapArray[i];
-      }
-    }
-    client.say(channel, nomListString);
-  }
-
-  if (message.toLowerCase().startsWith("!select") && (user.mod === true || user.badges.broadcaster === "1")) {
-    if (NominatedMapArray.length === 0) {
-      client.say(channel, "A map must be nominated first before you can select it.");
-      return;
-    }
-    if (message.split(" ")[1] == void 0) {
-      client.say(channel, "You did not select a map.");
-      return;
-    }
-
-    if (message.split(" ")[1] === "random") {
-      randomGet = Math.round(Math.random()*(NominatedMapArray.length - 1));
-      client.say(channel, NominatedMapArray[randomGet]);
-      NominatedMapArray = []; // clear array after selection
-    }
-
     else {
-      loadMap(message.split(" ")[1].toLowerCase());
-      for (i=0;i<NominatedMapArray.length;i++) {
-        if (NominatedMapArray[i].includes(mapName)) {
-          client.say(channel, mapName);
-          NominatedMapArray = [];
-          break;
-        }
-        else if (i+1 == NominatedMapArray.length) {
-          client.say(channel, "That wasn't a nominated map.");
-        }
-      }
+      client.say(channel, NominatedMapArray.toString());
     }
   }
 
-
-
-
-
-
-
-      if(message.toLowerCase().startsWith("!kzcommands")) {
-        client.say(channel, "A full list of commands is available here: https://github.com/Zach47/twitch_bot/ If you have any suggestions, please message Zach47 on Discord or Steam.");
+    if (message.toLowerCase().startsWith("!select") && (user.mod === true || user.badges.broadcaster === "1")) {
+      if (NominatedMapArray.length === 0) {
+        client.say(channel, "A map must be nominated first before you can select it.");
+        return;
+      }
+      if (message.split(" ")[1] == void 0) {
+        client.say(channel, "You did not select a map.");
+        return;
       }
 
-      if(message.toLowerCase().startsWith("!servers")) {
-        client.say(channel, "http://www.kzstats.com/servers/");
+      if (message.split(" ")[1] === "random") {
+        randomGet = Math.round(Math.random()*(NominatedMapArray.length - 1));
+        client.say(channel, NominatedMapArray[randomGet]);
+        NominatedMapArray = []; // clear array after selection
       }
 
-      if(message.toLowerCase().startsWith("!kzstats")) {
-        client.say(channel, "http://www.kzstats.com/");
-      }
-
-      if(message.toLowerCase().startsWith("!gokzstats")) {
-        client.say(channel, "https://www.jacobwbarrett.com/kreedz/gokzstats.html");
-      }
-
-      if(message.toLowerCase().startsWith("!randommap")) {
-        var randomGet = 0;
-
-
-        if (message.split(" ").length.toString() > 2) {
-          var splitMessage = message.split(" ");
-          combinedMapList = [];
-
-          for (i=1;i<message.split(" ").length;i++) {
-            if (splitMessage[i] == "veasy") {
-              combinedMapList.push.apply(combinedMapList, VeryEasyMaps);
-            }
-            if (splitMessage[i] == "easy") {
-              combinedMapList.push.apply(combinedMapList, EasyMaps);
-            }
-            if (splitMessage[i] == "medium") {
-              combinedMapList.push.apply(combinedMapList, MediumMaps);
-            }
-            if (splitMessage[i] == "hard") {
-              combinedMapList.push.apply(combinedMapList, HardMaps);
-            }
-            if (splitMessage[i] == "vhard") {
-              combinedMapList.push.apply(combinedMapList, VeryHardMaps);
-            }
-            if (splitMessage[i] == "death") {
-              combinedMapList.push.apply(combinedMapList, DeathMaps);
-            }
+      else {
+        loadMap(message.split(" ")[1].toLowerCase());
+        for (i=0;i<NominatedMapArray.length;i++) {
+          if (NominatedMapArray[i].includes(mapName)) {
+            client.say(channel, mapName);
+            NominatedMapArray = [];
+            break;
           }
-          randomGet = Math.round(Math.random()*(combinedMapList.length - 1));
-          client.say(channel, combinedMapList[randomGet].mapname);
-        } else {
-
-          switch(message.split(" ")[1]) {
-            case "help":
-            client.say(channel, "You can use !randommap by itself and it will give you any map. Use these parameters (including multiple parameters) with !randommap if you'd like a specific difficulty range: veasy, easy, medium, hard, vhard, death.");
-            break;
-            case "veasy":
-            randomGet = Math.round(Math.random()*(VeryEasyMaps.length - 1));
-            client.say(channel, VeryEasyMaps[randomGet].mapname);
-            break;
-            case "easy":
-            randomGet = Math.round(Math.random()*(EasyMaps.length - 1));
-            client.say(channel, EasyMaps[randomGet].mapname);
-            break;
-            case "medium":
-            randomGet = Math.round(Math.random()*(MediumMaps.length - 1));
-            client.say(channel, MediumMaps[randomGet].mapname);
-            break;
-            case "hard":
-            randomGet = Math.round(Math.random()*(HardMaps.length - 1));
-            client.say(channel, HardMaps[randomGet].mapname);
-            break;
-            case "vhard":
-            randomGet = Math.round(Math.random()*(VeryHardMaps.length - 1));
-            client.say(channel, VeryHardMaps[randomGet].mapname);
-            break;
-            case "death":
-            randomGet = Math.round(Math.random()*(DeathMaps.length - 1));
-            client.say(channel, DeathMaps[randomGet].mapname);
-            break;
-            default:
-            randomGet = Math.round(Math.random()*(maplist.length - 1));
-            client.say(channel, maplist[randomGet]);
+          else if (i+1 == NominatedMapArray.length) {
+            client.say(channel, "That wasn't a nominated map.");
           }
         }
       }
-    });
+    }
+
+
+
+
+
+
+
+    if(message.toLowerCase().startsWith("!kzcommands")) {
+      client.say(channel, "A full list of commands is available here: https://github.com/Zach47/twitch_bot/ If you have any suggestions, please message Zach47 on Discord or Steam.");
+    }
+
+    if(message.toLowerCase().startsWith("!servers")) {
+      client.say(channel, "http://www.kzstats.com/servers/");
+    }
+
+    if(message.toLowerCase().startsWith("!kzstats")) {
+      client.say(channel, "http://www.kzstats.com/");
+    }
+
+    if(message.toLowerCase().startsWith("!gokzstats")) {
+      client.say(channel, "https://www.jacobwbarrett.com/kreedz/gokzstats.html");
+    }
+
+    if(message.toLowerCase().startsWith("!randommap")) {
+      var randomGet = 0;
+
+
+      if (message.split(" ").length.toString() > 2) {
+        var splitMessage = message.split(" ");
+        combinedMapList = [];
+
+        for (i=1;i<message.split(" ").length;i++) {
+          if (splitMessage[i] == "veasy") {
+            combinedMapList.push.apply(combinedMapList, VeryEasyMaps);
+          }
+          if (splitMessage[i] == "easy") {
+            combinedMapList.push.apply(combinedMapList, EasyMaps);
+          }
+          if (splitMessage[i] == "medium") {
+            combinedMapList.push.apply(combinedMapList, MediumMaps);
+          }
+          if (splitMessage[i] == "hard") {
+            combinedMapList.push.apply(combinedMapList, HardMaps);
+          }
+          if (splitMessage[i] == "vhard") {
+            combinedMapList.push.apply(combinedMapList, VeryHardMaps);
+          }
+          if (splitMessage[i] == "death") {
+            combinedMapList.push.apply(combinedMapList, DeathMaps);
+          }
+        }
+        randomGet = Math.round(Math.random()*(combinedMapList.length - 1));
+        client.say(channel, combinedMapList[randomGet].mapname);
+      } else {
+
+        switch(message.split(" ")[1]) {
+          case "help":
+          client.say(channel, "You can use !randommap by itself and it will give you any map. Use these parameters (including multiple parameters) with !randommap if you'd like a specific difficulty range: veasy, easy, medium, hard, vhard, death.");
+          break;
+          case "veasy":
+          randomGet = Math.round(Math.random()*(VeryEasyMaps.length - 1));
+          client.say(channel, VeryEasyMaps[randomGet].mapname);
+          break;
+          case "easy":
+          randomGet = Math.round(Math.random()*(EasyMaps.length - 1));
+          client.say(channel, EasyMaps[randomGet].mapname);
+          break;
+          case "medium":
+          randomGet = Math.round(Math.random()*(MediumMaps.length - 1));
+          client.say(channel, MediumMaps[randomGet].mapname);
+          break;
+          case "hard":
+          randomGet = Math.round(Math.random()*(HardMaps.length - 1));
+          client.say(channel, HardMaps[randomGet].mapname);
+          break;
+          case "vhard":
+          randomGet = Math.round(Math.random()*(VeryHardMaps.length - 1));
+          client.say(channel, VeryHardMaps[randomGet].mapname);
+          break;
+          case "death":
+          randomGet = Math.round(Math.random()*(DeathMaps.length - 1));
+          client.say(channel, DeathMaps[randomGet].mapname);
+          break;
+          default:
+          randomGet = Math.round(Math.random()*(maplist.length - 1));
+          client.say(channel, maplist[randomGet]);
+        }
+      }
+    }
+  });
