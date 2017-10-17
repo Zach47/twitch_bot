@@ -6,7 +6,7 @@ Originally created as a means of replacing Orbit's custom nightbot command "!map
 
 Made in Node JS.
 ____
-# Commands
+# User Commands
 
 **!kzcommands** - Shows all commands available for the bot.
 
@@ -18,12 +18,15 @@ ____
 
 **!nomlist** - See which maps are nominated.
 
-**!select** ("random" or map name) - Allows **mods** and **the streamer** to select which of the nominated maps to play.
-        If someone types !select random, it will randomly select a map from the nominated list.
-        If someone types !select (map name), the map must both be a kreedz map and in the nominated map list.
-
 **!kzstats** - Provides a link to [KZStats](http://www.kzstats.com/).
 
 **!gokzstats** - Provides a link to [GOKZ Stats](https://www.jacobwbarrett.com/kreedz/gokzstats.html).
 
 **!servers** - Provides a link to [KZStats server link](http://www.kzstats.com/servers/).
+
+# Mod/Streamer Commands
+**!select** ("random" or map name) - Allows **mods** and **the streamer** to select which of the nominated maps to play.
+        If someone types !select random, it will randomly select a map from the nominated list.
+        If someone types !select (map name), the map must both be a kreedz map and in the nominated map list.
+
+**!clearnom** - Clears every nominated map.
