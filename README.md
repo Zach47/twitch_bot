@@ -22,7 +22,7 @@ ____
 
 **!gokzstats** - Provides a link to [GOKZ Stats](https://www.jacobwbarrett.com/kreedz/gokzstats.html).
 
-**!servers** - Provides a link to [KZStats server link](http://www.kzstats.com/servers/).
+**!servers** - Provides a link to [KZStats server list](http://www.kzstats.com/servers/).
 
 # Mod/Streamer Commands
 **!select** ("random" or map name) - Allows **mods** and **the streamer** to select which of the nominated maps to play.
