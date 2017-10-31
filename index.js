@@ -1,6 +1,6 @@
 // Kreedz Bot, by Jacob Barrett (Zach47)
 // This is a functioning twitch bot that is useful for cs:go kreedz streamers.
-// Version 1.2.2
+// Version 1.2.3
 
 var tmi = require('tmi.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -30,32 +30,20 @@ var options = {
 
   identity: {
     username: "kreedz_bot",
-    password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   },
-  channels: ["ijjust","orbit_cs","sachburger","neverluqy","slumpfy","zpammm"]
+  channels: ["ijjust","orbit_cs","sachburger","neverluqy","slumpfy","zpammm","gamechaos","netcodeyyy","ephneyo","byssl","BaIlisticBacon"]
 }
 
 
 function loadMap(map) {
   for (i=0;i<maplist.length;i++) {
-    if (maplist[i].includes(map)) {
+    if (maplist[i].indexOf(map) !== -1) {
       mapName = maplist[i];
       return true;
     }
   }
 }
-
-function addNomination(map) {
-  for (i=0;i<maplist.length;i++) {
-    if (maplist[i].includes(map)) {
-      NominatedMapArray.push(maplist[i]);
-      mapName = maplist[i];
-      return true;
-    }
-  }
-}
-
-
 
 function mapInfoRequest() {
   var request = new XMLHttpRequest();
@@ -123,88 +111,13 @@ client.on("connected", function(address, port, channel){
 client.on("chat", function(channel, user, message, self){
   if (self) return;
 
-
-
-
   if(message.toLowerCase().startsWith("!maptop")){
     if (message.split(" ")[1] == void 0) {
       client.say(channel, "You forgot a map name!");
       return;
     }
-
     else {
       client.say(channel, (loadMap(message.split(" ")[1].toLowerCase())) ? "http://www.kzstats.com/maps/" + mapName + "/" : "No map was found.");
-    }
-  }
-
-  if (message.toLowerCase().startsWith("!nominate")) {
-    if (message.split(" ")[1] == void 0) {
-      client.say(channel, "You forgot to nominate a map!");
-      return;
-    }
-    else {
-      client.say(channel, (addNomination(message.split(" ")[1].toLowerCase())) ? mapName + " has been added to the nomination list" : "No map was found.");
-    }
-  }
-
-  if (message.toLowerCase() === "!clearnom" && (user.mod === true || user.badges.broadcaster === "1")) {
-    NominatedMapArray = [];
-    client.say(channel, "Nomination list has been cleared by " + user.username)
-  }
-
-  if (message.toLowerCase().startsWith("!deletenom") && (user.mod === true || user.badges.broadcaster === "1")) {
-    if (message.split(" ")[1] == void 0) {
-      client.say(channel, "You need to select a map to delete.");
-      return;
-    }
-    else {
-      loadMap(message.split(" ")[1]);
-      if (NominatedMapArray.includes(mapName)) {
-        NominatedMapArray.splice(mapName, 1);
-        client.say(channel, mapName + " has been removed once from the nomination list by " + user.username);
-      }
-    }
-  }
-
-
-  if (message.toLowerCase().startsWith("!nomlist")) {
-    if (NominatedMapArray.length === 0) {
-      client.say(channel, "There aren't any nominated maps.");
-    }
-    else {
-      client.say(channel, NominatedMapArray.toString());
-    }
-  }
-
-
-  if (message.toLowerCase().startsWith("!select") && (user.mod === true || user.badges.broadcaster === "1")) {
-    if (NominatedMapArray.length === 0) {
-      client.say(channel, "A map must be nominated first before you can select it.");
-      return;
-    }
-    if (message.split(" ")[1] == void 0) {
-      client.say(channel, "You did not select a map.");
-      return;
-    }
-
-    else if (message.split(" ")[1] === "random") {
-      randomGet = Math.round(Math.random()*(NominatedMapArray.length - 1));
-      client.say(channel, NominatedMapArray[randomGet]);
-      NominatedMapArray = []; // clear array after selection
-    }
-
-    else {
-      loadMap(message.split(" ")[1].toLowerCase());
-      for (i=0;i<NominatedMapArray.length;i++) {
-        if (NominatedMapArray[i].includes(mapName)) {
-          client.say(channel, mapName);
-          NominatedMapArray = [];
-          break;
-        }
-        else if (i+1 == NominatedMapArray.length) {
-          client.say(channel, "That wasn't a nominated map.");
-        }
-      }
     }
   }
 
@@ -226,7 +139,6 @@ client.on("chat", function(channel, user, message, self){
 
   if(message.toLowerCase().startsWith("!randommap")) {
     var randomGet = 0;
-
 
     if (message.split(" ").length.toString() > 2) {
       var splitMessage = message.split(" ");
