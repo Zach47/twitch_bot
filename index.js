@@ -15,6 +15,9 @@ var VeryHardMaps = [];
 var DeathMaps = [];
 var NominatedMapArray = [];
 var mapName = "";
+var kzTimerMapTime = "";
+var kzSimpleMapTime = "";
+var kzVanillaMapTime = "";
 
 
 
@@ -32,18 +35,116 @@ var options = {
     username: "kreedz_bot",
     password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   },
-  channels: ["ijjust","orbit_cs","sachburger","neverluqy","slumpfy","zpammm","gamechaos","netcodeyyy","ephneyo","byssl","BaIlisticBacon"]
+  channels: ["ijjust","orbittron","sachburger","neverluqy","slumpfy","zpammm","gamechaos","netcodeyyy","ephneyo","byssl","BaIlisticBacon"]
 }
 
+/* https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds */
+function str_pad_left(string,pad,length) {
+  return (new Array(length+1).join(pad)+string).slice(-length);
+}
 
-function loadMap(map) {
-  for (i=0;i<maplist.length;i++) {
-    if (maplist[i].indexOf(map) !== -1) {
-      mapName = maplist[i];
-      return true;
-    }
+function timeConvert(time) {
+  ms = time.toString().split(".");
+  // API sends a time that ends with ".000" as just a whole number (Discovery: 12.000 is sent as 12). This fixes that.
+  if (!ms[1]) {
+    ms[1] = "000";
+  }
+  if (ms[1].length === 1) {
+    ms[1] += "0";
+  }
+  if (time >= 3600.00) {
+    hours = Math.floor(time / 3600.00);
+    minutes = Math.floor(time % 3600.00 /60.00);
+    seconds = Math.floor(time % 60.00);
+    return str_pad_left(hours,'',2)+':'+str_pad_left(minutes,'0',2)+':'+str_pad_left(seconds,'0',2) +'.'+ ms[1].substr(0,2);
+  }
+  else if (time === "NA") {
+    return "NA";
+  }
+  else if (time < 60) {
+    seconds = Math.floor(time % 60.00);
+    return str_pad_left(seconds,'0',2)+"."+ms[1].substr(0,2);
+  }
+  else {
+    minutes = Math.floor(time % 3600.00 /60.00);
+    seconds = Math.floor(time % 60.00);
+    return str_pad_left(minutes,'',2)+':'+str_pad_left(seconds,'0',2)+'.'+ ms[1].substr(0,2); // "time" is milliseconds
   }
 }
+
+
+function SimpleKZ(channel, map) {
+  var request = new XMLHttpRequest();
+
+  request.open('GET', 'http://kztimerglobal.com/api/v1.0/records/top?map_name=' + map + '&tickrate=128&stage=0&modes_list_string=kz_simple&has_teleports=false', true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      var maps = JSON.parse(request.responseText);
+      if (maps.length !== 0) {
+        if (maps[0].player_name.length < 14) {
+          kzSimpleMapTime = (mapName.length > 16 ? " ————Top Records On | " : " ————————Top Records on | ") + map + " ——————SimpleKZ | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+        }
+        else {
+          kzSimpleMapTime = (mapName.length > 16 ? " ————Top Records On | " : " ————————Top Records on | ") + map + " ——————SimpleKZ | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+        }
+      } else { kzSimpleMapTime = " ——————SimpleKZ | No Record Recorded Yet." }
+    } else { console.log("brokered"); }
+  };
+  request.onerror = function() { console.log("mega brokered"); };
+  request.send();
+  return true;
+}
+
+function KZTimer(channel, map) {
+  var request = new XMLHttpRequest();
+
+  request.open('GET', 'http://kztimerglobal.com/api/v1.0/records/top?map_name=' + map + '&tickrate=128&stage=0&modes_list_string=kz_timer&has_teleports=false', true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      var maps = JSON.parse(request.responseText);
+      if (maps.length !== 0) {
+        if (maps[0].player_name.length < 14) {
+          kzTimerMapTime = " ——————KZTimer | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+        }
+        else {
+          kzTimerMapTime = " ——————KZTimer | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+        }
+      } else { kzTimerMapTime = " ——————KZTimer | No Record Recorded Yet." }
+    } else { console.log("brokered"); }
+  };
+  request.onerror = function() { console.log("mega brokered"); };
+  request.send();
+  return true;
+}
+
+function VanillaKZ(channel, map) {
+  var request = new XMLHttpRequest();
+
+  request.open('GET', 'http://kztimerglobal.com/api/v1.0/records/top?map_name=' + map + '&tickrate=128&stage=0&modes_list_string=kz_vanilla&has_teleports=false', true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      var maps = JSON.parse(request.responseText);
+      if (maps.length !== 0) {
+        if (maps[0].player_name.length < 14) {
+          kzVanillaMapTime = "——————VanillaKZ | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+        }
+        else {
+          kzVanillaMapTime = "——————VanillaKZ | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+        }
+      } else { kzVanillaMapTime = " ——————VanillaKZ | No Record Recorded Yet." }
+    } else { console.log("brokered"); }
+  };
+  request.onerror = function() { console.log("mega brokered"); };
+  request.send();
+  return true;
+}
+
+
+
+
+
+
+
 
 function mapInfoRequest() {
   var request = new XMLHttpRequest();
@@ -112,12 +213,30 @@ client.on("chat", function(channel, user, message, self){
   if (self) return;
 
   if(message.toLowerCase().startsWith("!maptop")){
+
     if (message.split(" ")[1] == void 0) {
       client.say(channel, "You forgot a map name!");
       return;
     }
     else {
-      client.say(channel, (loadMap(message.split(" ")[1].toLowerCase())) ? "http://www.kzstats.com/maps/" + mapName + "/" : "No map was found.");
+      var mapFound = 0;
+      for (i=0;i<maplist.length;i++) {
+        if (maplist[i].indexOf(message.split(" ")[1].toLowerCase()) !== -1) {
+          mapFound = 1;
+          mapName = maplist[i];
+          SimpleKZ(channel, mapName);
+          KZTimer(channel, mapName);
+          VanillaKZ(channel, mapName);
+
+          setTimeout(function() {
+            client.say(channel, "—— GOKZ Stats ——————" + kzSimpleMapTime + kzTimerMapTime + kzVanillaMapTime);
+          }, 300);
+          break;
+        }
+      }
+      if (mapFound === 0) {
+        client.say(channel, "Invalid map name. Please enter a partial or full global map name.");
+      }
     }
   }
 
@@ -126,15 +245,15 @@ client.on("chat", function(channel, user, message, self){
   }
 
   if(message.toLowerCase().startsWith("!servers")) {
-    client.say(channel, "http://www.kzstats.com/servers/");
+    client.say(channel, "kzstats.com/servers/");
   }
 
   if(message.toLowerCase().startsWith("!kzstats")) {
-    client.say(channel, "http://www.kzstats.com/");
+    client.say(channel, "kzstats.com/");
   }
 
   if(message.toLowerCase().startsWith("!gokzstats")) {
-    client.say(channel, "https://www.jacobwbarrett.com/kreedz/gokzstats.html");
+    client.say(channel, "gokzstats.com");
   }
 
   if(message.toLowerCase().startsWith("!randommap")) {
