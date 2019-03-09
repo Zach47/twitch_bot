@@ -1,10 +1,9 @@
 // Kreedz Bot, by Jacob Barrett (Zach47)
-// This is a functioning twitch bot that is useful for cs:go kreedz streamers.
-// Version 1.2.3
+// This is a functioning twitch bot that is meant for CS:GO KZ streamers.
+// Version 1.2.4
 
 var tmi = require('tmi.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-var jsonMapId = {};
 var maplist = [];
 var combinedMapList = [];
 var VeryEasyMaps = [];
@@ -18,6 +17,7 @@ var mapName = "";
 var kzTimerMapTime = "";
 var kzSimpleMapTime = "";
 var kzVanillaMapTime = "";
+var timeout = 0;
 
 
 
@@ -33,9 +33,9 @@ var options = {
 
   identity: {
     username: "kreedz_bot",
-    password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    password: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   },
-  channels: ["ijjust","orbittron","sachburger","neverluqy","slumpfy","zpammm","gamechaos","netcodeyyy","ephneyo","byssl","BaIlisticBacon"]
+  channels: ["ijjust"]
 }
 
 /* https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds */
@@ -82,12 +82,14 @@ function SimpleKZ(channel, map) {
       var maps = JSON.parse(request.responseText);
       if (maps.length !== 0) {
         if (maps[0].player_name.length < 14) {
-          kzSimpleMapTime = (mapName.length > 16 ? " ————Top Records On | " : " ————————Top Records on | ") + map + " ——————SimpleKZ | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+          mapName = maps[0].map_name;
+          kzSimpleMapTime = timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
         else {
-          kzSimpleMapTime = (mapName.length > 16 ? " ————Top Records On | " : " ————————Top Records on | ") + map + " ——————SimpleKZ | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+          kzSimpleMapTime = timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
-      } else { kzSimpleMapTime = " ——————SimpleKZ | No Record Recorded Yet." }
+      } else {
+        kzSimpleMapTime = "NA"; }
     } else { console.log("brokered"); }
   };
   request.onerror = function() { console.log("mega brokered"); };
@@ -104,14 +106,16 @@ function KZTimer(channel, map) {
       var maps = JSON.parse(request.responseText);
       if (maps.length !== 0) {
         if (maps[0].player_name.length < 14) {
-          kzTimerMapTime = " ——————KZTimer | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+          kzTimerMapTime = timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
         else {
-          kzTimerMapTime = " ——————KZTimer | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+          kzTimerMapTime =  timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
-      } else { kzTimerMapTime = " ——————KZTimer | No Record Recorded Yet." }
-    } else { console.log("brokered"); }
-  };
+      } else {
+		  kzTimerMapTime = "NA";
+		}
+	} else { console.log("brokered"); }
+};
   request.onerror = function() { console.log("mega brokered"); };
   request.send();
   return true;
@@ -126,12 +130,13 @@ function VanillaKZ(channel, map) {
       var maps = JSON.parse(request.responseText);
       if (maps.length !== 0) {
         if (maps[0].player_name.length < 14) {
-          kzVanillaMapTime = "——————VanillaKZ | " + timeConvert(maps[0].time) + (maps[0].player_name.length < 7 ? " ———— " + maps[0].player_name : " — " + maps[0].player_name);
+          kzVanillaMapTime = timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
         else {
-          kzVanillaMapTime = "——————VanillaKZ | " + timeConvert(maps[0].time) + " — " + maps[0].player_name.substr(0,11) + "...";
+          kzVanillaMapTime = timeConvert(maps[0].time) + " by " + maps[0].player_name;
         }
-      } else { kzVanillaMapTime = " ——————VanillaKZ | No Record Recorded Yet." }
+      } else {
+        kzVanillaMapTime = "NA"; }
     } else { console.log("brokered"); }
   };
   request.onerror = function() { console.log("mega brokered"); };
@@ -148,7 +153,7 @@ function VanillaKZ(channel, map) {
 
 function mapInfoRequest() {
   var request = new XMLHttpRequest();
-  request.open('GET', 'https://www.jacobwbarrett.com/js/mapListNew.js', true);
+  request.open('GET', 'https://kztimerglobal.com/api/v1.0/maps?limit=1000', true);
 
   request.onload = function() {
     if (request.status >= 200 && request.status < 400) {
@@ -162,26 +167,25 @@ function mapInfoRequest() {
           return;
         }
         else {
-          jsonMapId[maps[i].id] = [maps[i].mapname,maps[i].workshop_id,maps[i].difficulty_id];
-          maplist.push(jsonMapId[maps[i].id][0]);
+          maplist.push(maps[i].name);
 
           if (maps[i].difficulty_id == 1) {
-            VeryEasyMaps.push(maps[i]);
+            VeryEasyMaps.push(maps[i].name);
           }
           else if (maps[i].difficulty_id == 2) {
-            EasyMaps.push(maps[i]);
+            EasyMaps.push(maps[i].name);
           }
           else if (maps[i].difficulty_id == 3) {
-            MediumMaps.push(maps[i]);
+            MediumMaps.push(maps[i].name);
           }
           else if (maps[i].difficulty_id == 4) {
-            HardMaps.push(maps[i]);
+            HardMaps.push(maps[i].name);
           }
           else if (maps[i].difficulty_id == 5) {
-            VeryHardMaps.push(maps[i]);
+            VeryHardMaps.push(maps[i].name);
           }
           else if (maps[i].difficulty_id == 6) {
-            DeathMaps.push(maps[i]);
+            DeathMaps.push(maps[i].name);
           }
         }
       }
@@ -211,6 +215,10 @@ client.on("connected", function(address, port, channel){
 //This function is executed everytime someone sends a message in the chat.
 client.on("chat", function(channel, user, message, self){
   if (self) return;
+  
+  if (timeout !== 0) {
+	  return;
+  }
 
   if(message.toLowerCase().startsWith("!maptop")){
 
@@ -218,19 +226,43 @@ client.on("chat", function(channel, user, message, self){
       client.say(channel, "You forgot a map name!");
       return;
     }
+	if (message.split(" ")[2] == void 0) {
+      client.say(channel, "You forgot a mode!");
+      return;
+    }
+	else if (!(message.split(" ")[2].toUpperCase() === "KZT" || message.split(" ")[2].toUpperCase() === "SKZ" || message.split(" ")[2].toUpperCase() === "VNL")) {
+		client.say(channel, "Invalid mode. Requires 'KZT, SKZ, or VNL.'");
+		client.say(channel, message.split(" ")[2]);
+		return;
+	}
     else {
       var mapFound = 0;
       for (i=0;i<maplist.length;i++) {
         if (maplist[i].indexOf(message.split(" ")[1].toLowerCase()) !== -1) {
           mapFound = 1;
           mapName = maplist[i];
-          SimpleKZ(channel, mapName);
-          KZTimer(channel, mapName);
-          VanillaKZ(channel, mapName);
-
-          setTimeout(function() {
-            client.say(channel, "—— GOKZ Stats ——————" + kzSimpleMapTime + kzTimerMapTime + kzVanillaMapTime);
-          }, 300);
+		  if (message.split(" ")[2].toUpperCase() == "KZT") {
+			KZTimer(channel, mapName);
+			setTimeout(function() {
+			client.say(channel, mapName + ": " + kzTimerMapTime);
+          }, 1200);
+		  }
+		  if (message.split(" ")[2].toUpperCase() == "SKZ") {
+			SimpleKZ(channel, mapName);
+			setTimeout(function() {
+			client.say(channel, mapName + ": " + kzSimpleMapTime);
+          }, 1200);
+		  }
+		  if (message.split(" ")[2].toUpperCase() == "VNL") {
+			VanillaKZ(channel, mapName);
+			setTimeout(function() {
+			client.say(channel, mapName + ": " + kzVanillaMapTime);
+          }, 1200);
+		  }
+		  timeout = 1;
+		  setTimeout(function() {
+			timeout = 0;
+          }, 10000);
           break;
         }
       }
@@ -242,83 +274,17 @@ client.on("chat", function(channel, user, message, self){
 
   if(message.toLowerCase().startsWith("!kzcommands") || message.toLowerCase().startsWith("!help")) {
     client.say(channel, "The full list of commands for kreedz_bot is available here: https://github.com/Zach47/twitch_bot/");
-  }
-
-  if(message.toLowerCase().startsWith("!servers")) {
-    client.say(channel, "kzstats.com/servers/");
-  }
-
-  if(message.toLowerCase().startsWith("!kzstats")) {
-    client.say(channel, "kzstats.com/");
+	timeout = 1;
+		  setTimeout(function() {
+			timeout = 0;
+          }, 5000);
   }
 
   if(message.toLowerCase().startsWith("!gokzstats")) {
-    client.say(channel, "gokzstats.com");
-  }
-
-  if(message.toLowerCase().startsWith("!randommap")) {
-    var randomGet = 0;
-
-    if (message.split(" ").length.toString() > 2) {
-      var splitMessage = message.split(" ");
-      combinedMapList = [];
-
-      for (i=1;i<message.split(" ").length;i++) {
-        if (splitMessage[i] == "veasy") {
-          combinedMapList.push.apply(combinedMapList, VeryEasyMaps);
-        }
-        if (splitMessage[i] == "easy") {
-          combinedMapList.push.apply(combinedMapList, EasyMaps);
-        }
-        if (splitMessage[i] == "medium") {
-          combinedMapList.push.apply(combinedMapList, MediumMaps);
-        }
-        if (splitMessage[i] == "hard") {
-          combinedMapList.push.apply(combinedMapList, HardMaps);
-        }
-        if (splitMessage[i] == "vhard") {
-          combinedMapList.push.apply(combinedMapList, VeryHardMaps);
-        }
-        if (splitMessage[i] == "death") {
-          combinedMapList.push.apply(combinedMapList, DeathMaps);
-        }
-      }
-      randomGet = Math.round(Math.random()*(combinedMapList.length - 1));
-      client.say(channel, combinedMapList[randomGet].mapname);
-    } else {
-
-      switch(message.split(" ")[1]) {
-        case "help":
-        client.say(channel, "You can use !randommap by itself and it will give you any map. Use these parameters (including multiple parameters) with !randommap if you'd like a specific difficulty range: veasy, easy, medium, hard, vhard, death.");
-        break;
-        case "veasy":
-        randomGet = Math.round(Math.random()*(VeryEasyMaps.length - 1));
-        client.say(channel, VeryEasyMaps[randomGet].mapname);
-        break;
-        case "easy":
-        randomGet = Math.round(Math.random()*(EasyMaps.length - 1));
-        client.say(channel, EasyMaps[randomGet].mapname);
-        break;
-        case "medium":
-        randomGet = Math.round(Math.random()*(MediumMaps.length - 1));
-        client.say(channel, MediumMaps[randomGet].mapname);
-        break;
-        case "hard":
-        randomGet = Math.round(Math.random()*(HardMaps.length - 1));
-        client.say(channel, HardMaps[randomGet].mapname);
-        break;
-        case "vhard":
-        randomGet = Math.round(Math.random()*(VeryHardMaps.length - 1));
-        client.say(channel, VeryHardMaps[randomGet].mapname);
-        break;
-        case "death":
-        randomGet = Math.round(Math.random()*(DeathMaps.length - 1));
-        client.say(channel, DeathMaps[randomGet].mapname);
-        break;
-        default:
-        randomGet = Math.round(Math.random()*(maplist.length - 1));
-        client.say(channel, maplist[randomGet]);
-      }
-    }
+    client.say(channel, "https://gokzstats.com");
+	timeout = 1;
+		  setTimeout(function() {
+			timeout = 0;
+          }, 5000);
   }
 });
